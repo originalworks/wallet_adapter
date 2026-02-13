@@ -9,3 +9,9 @@ alloy-signer-aws = "1.6.3"
 anyhow = "1.0.101"
 aws-config = "1.8.13"
 aws-sdk-kms = "1.99.0"
+
+[dev-dependencies]
+serial_test = "3.3.1"
+alloy = { version = "1.6.3", features = ["node-bindings"] }
+tokio = "1.49.0"
+dotenvy = "0.15.7"
