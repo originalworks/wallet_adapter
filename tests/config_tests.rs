@@ -5,7 +5,7 @@ struct TestConfig {
     signer_kms_id: Option<String>,
 }
 
-impl ow_wallet::HasOwWalletFields for TestConfig {
+impl ow_wallet_adapter::HasOwWalletFields for TestConfig {
     fn use_kms(&self) -> bool {
         self.use_kms
     }
@@ -23,7 +23,7 @@ impl ow_wallet::HasOwWalletFields for TestConfig {
 #[cfg(test)]
 mod config_tests {
     use super::*;
-    use ow_wallet::OwWalletConfig;
+    use ow_wallet_adapter::OwWalletConfig;
     use serial_test::serial;
     use std::env;
 

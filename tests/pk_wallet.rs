@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod pk_wallet_tests {
-    use ow_wallet::{OwWalletConfig, wallet::OwWallet};
+    use ow_wallet_adapter::{OwWalletConfig, wallet::OwWallet};
     use serial_test::serial;
 
     #[tokio::test]

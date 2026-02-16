@@ -5,7 +5,7 @@ mod kms_wallet_tests {
     // 2. use .env.example file to create your .env file and provide your real KMS_KEY_ID and RPC_URL
     // 3. comment out `#[ignore]`
 
-    use ow_wallet::{OwWalletConfig, wallet::OwWallet};
+    use ow_wallet_adapter::{OwWalletConfig, wallet::OwWallet};
     use serial_test::serial;
 
     #[tokio::test]
