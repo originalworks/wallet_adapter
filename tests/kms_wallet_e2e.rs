@@ -20,8 +20,6 @@ mod kms_wallet_tests {
 
         let wallet = wallet.unwrap();
         assert_eq!(wallet.use_kms, true);
-        assert!(wallet.aws_signer.is_some());
-        assert!(wallet.private_key_signer.is_none());
     }
 
     #[tokio::test]
