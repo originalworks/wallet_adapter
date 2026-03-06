@@ -12,9 +12,11 @@ use crate::OwWalletConfig;
 
 pub struct OwWallet {
     pub use_kms: bool,
-    pub aws_signer: Option<AwsSigner>,
-    pub private_key_signer: Option<PrivateKeySigner>,
     pub wallet: EthereumWallet,
+    pub chain_id: u64,
+    pub rpc_url: String,
+    aws_signer: Option<AwsSigner>,
+    private_key_signer: Option<PrivateKeySigner>,
 }
 
 impl OwWallet {
@@ -22,12 +24,13 @@ impl OwWallet {
         let wallet: EthereumWallet;
         let mut aws_signer = None;
         let mut private_key_signer: Option<PrivateKeySigner> = None;
-        if config.use_kms {
-            let rpc_provider = ProviderBuilder::new()
-                .connect(&config.rpc_url.as_str())
-                .await?;
-            let chain_id = rpc_provider.get_chain_id().await?;
 
+        let rpc_provider = ProviderBuilder::new()
+            .connect(&config.rpc_url.as_str())
+            .await?;
+        let chain_id = rpc_provider.get_chain_id().await?;
+
+        if config.use_kms {
             let region_provider = RegionProviderChain::default_provider().or_else("us-east-1");
             let aws_main_config = aws_config::defaults(BehaviorVersion::latest())
                 .region(region_provider)
@@ -38,8 +41,7 @@ impl OwWallet {
 
             let key_id = config.try_signer_kms_id()?;
 
-            let chain_id = Some(chain_id);
-            let signer = AwsSigner::new(client, key_id.to_string(), chain_id)
+            let signer = AwsSigner::new(client, key_id.to_string(), Some(chain_id))
                 .await
                 .expect("Failed to initialize AwsSigner");
 
@@ -61,6 +63,8 @@ impl OwWallet {
             aws_signer,
             private_key_signer,
             wallet,
+            chain_id,
+            rpc_url: config.rpc_url.clone(),
         })
     }
 

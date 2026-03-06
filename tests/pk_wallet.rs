@@ -1,14 +1,17 @@
 #[cfg(test)]
 mod pk_wallet_tests {
+    use alloy::node_bindings::Anvil;
     use ow_wallet_adapter::{OwWalletConfig, wallet::OwWallet};
     use serial_test::serial;
 
     #[tokio::test]
     #[serial]
     async fn test_wallet_build_with_private_key() {
+        let anvil = Anvil::new().spawn();
+
         let config = OwWalletConfig {
             use_kms: false,
-            rpc_url: "https://eth-mainnet.g.alchemy.com/v2/your-api-key".to_string(),
+            rpc_url: anvil.endpoint(),
             private_key: Some(
                 "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80".to_string(),
             ), // test private key from Hardhat
@@ -20,15 +23,15 @@ mod pk_wallet_tests {
 
         let wallet = wallet.unwrap();
         assert_eq!(wallet.use_kms, false);
-        assert!(wallet.aws_signer.is_none());
-        assert!(wallet.private_key_signer.is_some());
     }
 
     #[tokio::test]
     async fn test_wallet_sign_message_with_private_key() {
+        let anvil = Anvil::new().spawn();
+
         let config = OwWalletConfig {
             use_kms: false,
-            rpc_url: "https://eth-mainnet.g.alchemy.com/v2/your-api-key".to_string(),
+            rpc_url: anvil.endpoint(),
             private_key: Some(
                 "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80".to_string(),
             ),
