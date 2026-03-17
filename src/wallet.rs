@@ -1,5 +1,8 @@
 use alloy::network::EthereumWallet;
 use alloy::primitives::Address;
+use alloy::providers::fillers::{
+    BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller,
+};
 use alloy::providers::{Provider, ProviderBuilder};
 use alloy::signers::Signer;
 use alloy::signers::local::PrivateKeySigner;
@@ -15,6 +18,13 @@ pub struct OwWallet {
     pub wallet: EthereumWallet,
     pub chain_id: u64,
     pub rpc_url: String,
+    pub provider: FillProvider<
+        JoinFill<
+            alloy::providers::Identity,
+            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+        >,
+        alloy::providers::RootProvider,
+    >,
     aws_signer: Option<AwsSigner>,
     private_key_signer: Option<PrivateKeySigner>,
 }
@@ -25,10 +35,10 @@ impl OwWallet {
         let mut aws_signer = None;
         let mut private_key_signer: Option<PrivateKeySigner> = None;
 
-        let rpc_provider = ProviderBuilder::new()
+        let provider = ProviderBuilder::new()
             .connect(&config.rpc_url.as_str())
             .await?;
-        let chain_id = rpc_provider.get_chain_id().await?;
+        let chain_id = provider.get_chain_id().await?;
 
         if config.use_kms {
             let region_provider = RegionProviderChain::default_provider().or_else("us-east-1");
@@ -63,6 +73,7 @@ impl OwWallet {
             aws_signer,
             private_key_signer,
             wallet,
+            provider,
             chain_id,
             rpc_url: config.rpc_url.clone(),
         })
