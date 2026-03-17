@@ -91,6 +91,14 @@ impl OwWallet {
             .ok_or_else(|| anyhow::anyhow!("Missing private_key_signer"))
     }
 
+    pub fn get_address(&self) -> anyhow::Result<Address> {
+        if self.use_kms {
+            Ok(self.try_aws_signer()?.address())
+        } else {
+            Ok(self.try_private_key_signer()?.address())
+        }
+    }
+
     pub async fn sign_message(&self, message: &[u8]) -> anyhow::Result<alloy::signers::Signature> {
         let signature;
         if self.use_kms {
