@@ -1,6 +1,6 @@
 use alloy::eips::BlockId;
 use alloy::network::EthereumWallet;
-use alloy::primitives::Address;
+use alloy::primitives::{Address, B256};
 use alloy::providers::fillers::{
     BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller,
 };
@@ -119,6 +119,18 @@ impl OwWallet {
         } else {
             let private_key_signer = self.try_private_key_signer()?;
             signature = private_key_signer.sign_message(message).await?;
+        }
+        Ok(signature)
+    }
+
+    pub async fn sign_hash(&self, hash: B256) -> anyhow::Result<alloy::signers::Signature> {
+        let signature;
+        if self.use_kms {
+            let aws_signer = self.try_aws_signer()?;
+            signature = aws_signer.sign_hash(&hash).await?;
+        } else {
+            let private_key_signer = self.try_private_key_signer()?;
+            signature = private_key_signer.sign_hash(&hash).await?;
         }
         Ok(signature)
     }
