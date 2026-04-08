@@ -1,3 +1,4 @@
+use crate::OwWalletConfig;
 use alloy::eips::BlockId;
 use alloy::network::EthereumWallet;
 use alloy::primitives::{Address, B256};
@@ -7,12 +8,12 @@ use alloy::providers::fillers::{
 use alloy::providers::{Provider, ProviderBuilder};
 use alloy::signers::Signer;
 use alloy::signers::local::PrivateKeySigner;
+use alloy::sol_types::SolStruct;
 use alloy_signer_aws::AwsSigner;
+use alloy_sol_types::Eip712Domain;
 use anyhow::Context;
 use aws_config::BehaviorVersion;
 use aws_config::meta::region::RegionProviderChain;
-
-use crate::OwWalletConfig;
 
 pub struct OwWallet {
     pub use_kms: bool,
@@ -131,6 +132,22 @@ impl OwWallet {
         } else {
             let private_key_signer = self.try_private_key_signer()?;
             signature = private_key_signer.sign_hash(&hash).await?;
+        }
+        Ok(signature)
+    }
+
+    pub async fn sign_typed_data<T: SolStruct + Send + Sync>(
+        &self,
+        payload: &T,
+        domain: &Eip712Domain,
+    ) -> anyhow::Result<alloy::signers::Signature> {
+        let signature;
+        if self.use_kms {
+            let aws_signer = self.try_aws_signer()?;
+            signature = aws_signer.sign_typed_data(payload, domain).await?;
+        } else {
+            let private_key_signer = self.try_private_key_signer()?;
+            signature = private_key_signer.sign_typed_data(payload, domain).await?;
         }
         Ok(signature)
     }

@@ -1,6 +1,6 @@
 [package]
 name = "ow_wallet_adapter"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 description = "Original Works EVM wallet adapter library with KMS integration"
@@ -10,7 +10,9 @@ readme = "README.md"
 
 [dependencies]
 alloy = "1.6.3"
+alloy-signer = { version = "1.8.3", features = ["eip712"] }
 alloy-signer-aws = "1.6.3"
+alloy-sol-types = "1.5.7"
 anyhow = "1.0.101"
 aws-config = "1.8.13"
 aws-sdk-kms = "1.99.0"
@@ -20,3 +22,6 @@ serial_test = "3.3.1"
 alloy = { version = "1.6.3", features = ["node-bindings"] }
 tokio = "1.49.0"
 dotenvy = "0.15.7"
+
+[features]
+aws = []
