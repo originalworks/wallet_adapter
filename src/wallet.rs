@@ -100,17 +100,6 @@ impl OwWallet {
             Ok(self.try_private_key_signer()?.address())
         }
     }
-    pub async fn get_pending_nonce(&self) -> anyhow::Result<u64> {
-        let address = self.get_address()?;
-
-        let nonce = self
-            .provider
-            .get_transaction_count(address)
-            .block_id(BlockId::pending())
-            .await?;
-
-        Ok(nonce)
-    }
 
     pub async fn sign_message(&self, message: &[u8]) -> anyhow::Result<alloy::signers::Signature> {
         let signature;
